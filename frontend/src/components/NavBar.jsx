@@ -1,5 +1,8 @@
 import React from "react";
 import { Link, useNavigate} from "react-router-dom";
+import {User, ShoppingCart} from "lucide-react";
+
+
 
 export default function Navbar() {
     const navigate = useNavigate();
@@ -31,34 +34,30 @@ export default function Navbar() {
     <div className="navbar bg-base-100 shadow-sm px-4">
       {/* Brand/Logo */}
       <div className="flex-1">
-        <Link to="/" className="btn btn-ghost text-xl text-green-700">
+        <Link to="/dashboard" className="btn btn-ghost text-xl text-green-700">
           EcoFinds
         </Link>
       </div>
 
       {/* Nav links (hidden on mobile, shown on md+) */}
       <div className="hidden md:flex gap-2">
-        <Link to="/" className="btn btn-ghost">Home</Link>
+        <Link to="/dashboard" className="btn btn-ghost">Home</Link>
         <Link to="/marketplace" className="btn btn-ghost">Marketplace</Link>
-        <Link to="/about" className="btn btn-ghost">About</Link>
-        <Link to="/contact" className="btn btn-ghost">Contact</Link>
+        <Link to="/cart" className="btn btn-ghost">
+        <ShoppingCart className="w-10 h-10 rounded-full" />
+        </Link>
+            
+          
       </div>
+
+      
 
       {/* Search bar & Profile dropdown */}
       <div className="flex gap-2 items-center">
-        {/* Optional: Search input */}
-        {/* <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto" /> */}
-
-        {/* Profile Avatar with Dropdown */}
+        
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-            <div className="w-10 rounded-full">
-              {/* Replace src with user's avatar if available */}
-              <img
-                alt="User avatar"
-                src="https://img.daisyui.com/images/profile/demo/profile1.jpg"
-              />
-            </div>
+            <User className="w-10 h-10 rounded-full" />
           </div>
           <ul
             tabIndex={0}
@@ -104,27 +103,23 @@ export default function Navbar() {
           className="menu menu-sm dropdown-content mt-3 z-[2] p-2 shadow bg-base-100 rounded-box w-52"
         >
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/dashboard">Home</Link>
           </li>
           <li>
+            <div className="shopping-cart">
             <Link to="/marketplace">Marketplace</Link>
+            </div>
           </li>
           <li>
-            <Link to="/about">About</Link>
-          </li>
-          <li>
-            <Link to="/contact">Contact</Link>
+            <Link to="/cart">cart</Link>
           </li>
           <li>
             <Link to="/profile">Profile</Link>
           </li>
-          {/* <li>
-            <Link to="/settings">Settings</Link>
-          </li> */}
           <li>
             <button
               onClick={() => {
-                // Add your logout logic here
+                handleLogout();
               }}
             >
               Logout

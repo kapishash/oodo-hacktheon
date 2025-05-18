@@ -38,33 +38,52 @@ router.put("/profile", proctedRoute, async (req, res) => {
     }
 })
 
+
+
 // Cart
-// router.get('/cart', proctedRoute, async (req, res) => {
-//   const user = await User.findById(req.user.id).populate('cart');
-//   res.json(user.cart);
-// });
+router.get('/cart', proctedRoute, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('cart');
+    res.json(user.cart);
+  } catch (error) {
+    console.log("error occured in get cart route", error.message);
+    res.status(500).json({ message: error.message });
+  }
+});
 
-// router.post('/cart', proctedRoute, async (req, res) => {
-//   const { productId } = req.body;
-//   const user = await User.findById(req.user.id);
-//   if (!user.cart.includes(productId)) user.cart.push(productId);
-//   await user.save();
-//   res.json(user.cart);
-// });
+router.post('/cart', proctedRoute, async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user.cart.includes(productId)) user.cart.push(productId);
+    await user.save();
+    res.json(user.cart);
+} catch (error) {
+    console.log("error occurred in post cart route", error.message);
+    res.status(500).json({ message: error.message });
+}
+});
 
-// router.delete('/cart/:productId', proctedRoute, async (req, res) => {
-//   const { productId } = req.params;
-//   const user = await User.findById(req.user.id);
-//   user.cart = user.cart.filter(id => id.toString() !== productId);
-//   await user.save();
-//   res.json(user.cart);
-// });
+router.delete('/cart/:productId', proctedRoute, async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const user = await User.findById(req.user.id);
+    user.cart = user.cart.filter(id => id.toString() !== productId);
+    await user.save();
+    res.json(user.cart);
+  } catch (error) {
+    console.log("error occurred in delete cart route", error.message);
+    res.status(500).json({ message: error.message });
+  }
+});
 
-// // Purchases
-// router.get('/purchases', proctedRoute, async (req, res) => {
-//   const user = await User.findById(req.user.id).populate('purchases');
-//   res.json(user.purchases);
-// });
+// Purchases
+router.get('/purchases', proctedRoute, async (req, res) => {
+  const user = await User.findById(req.user.id).populate('purchases');
+  res.json(user.purchases);
+});
+
+
 
 
 

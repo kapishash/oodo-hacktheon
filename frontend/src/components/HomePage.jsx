@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function HomePage() {
   const [email, setEmail] = useState("");
@@ -18,7 +19,7 @@ export default function HomePage() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // important to send cookies
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -148,6 +149,13 @@ export default function HomePage() {
             ) : null}
             {loading ? "Logging in..." : "Login"}
           </button>
+          <div className="text-center text-gray-800 mt-4">
+                    Don't have account?{" "}
+                    <Link to="/signup" className="text-green-700 underline">
+                      Sign Up
+                    </Link>
+                  </div>
+          
         </form>
       </div>
     </div>

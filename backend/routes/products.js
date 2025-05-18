@@ -5,17 +5,57 @@ import { proctedRoute } from "../utils/protectedRoute.js";
 const router = express.Router();
 
 
-
 router.get("/", proctedRoute, async (req, res) => {
+  try {
+    const { category, search, limit = 10, page = 1 } = req.query;
+
+    let filter = {};
+    if (category) {
+      filter.category = category;
+    }
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' }; // Use 'name' as per your model
+    }
+
+    // Convert limit and page to numbers, provide defaults
+    const lim = Math.max(Number(limit), 1);
+    const skip = (Math.max(Number(page), 1) - 1) * lim;
+
+    const products = await Product.find(filter)
+      .sort({ createdAt: -1 }) // newest first, optional
+      .skip(skip)
+      .limit(lim);
+
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+router.get("/user", proctedRoute, async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find({ ceratedBy: req.user.id });
         res.status(200).json(products);
+        
+    } catch (error) {
+        console.log("error in product api:", error.message)
+        res.status(500).json({ message: error.message });
+        
+    }
+})
+
+router.get("/:id", proctedRoute, async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ message: "Product not found" });
+        res.json(product);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-router.post("/create_product", proctedRoute, async (req, res) => {
+router.post("/add_product", proctedRoute, async (req, res) => {
 
     const { name, image, price, category, description } = req.body;
 
@@ -77,78 +117,9 @@ router.put("/:id", proctedRoute, async (req, res) => {
         res.json(updatedProduct);
     } catch (error) {
         res.status(500).json({ message: "error updating product." });
-        console.log("error in update route", error.message);
+        console.log("error in update product route", error.message);
     }
 });
 
 
 export default router;
-
-
-// import express from 'express';
-// import Product from '../models/Product.js';
-// import { proctedRoute } from '../utils/protectedRoute.js';
-
-// const router = express.Router();
-
-// // Create Product
-// router.post('/', auth, async (req, res) => {
-//   const { title, description, category, price, imagePlaceholder } = req.body;
-//   const product = new Product({
-//     title,
-//     description,
-//     category,
-//     price,
-//     imagePlaceholder,
-//     ownerId: req.user.id
-//   });
-//   await product.save();
-//   res.json(product);
-// });
-
-// // Get All Products (with category filter & search)
-// router.get('/', async (req, res) => {
-//   const { category, search } = req.query;
-//   let filter = {};
-//   if (category) filter.category = category;
-//   if (search) filter.title = { $regex: search, $options: 'i' };
-//   const products = await Product.find(filter);
-//   res.json(products);
-// });
-
-// // Get Product by ID
-// router.get('/:id', async (req, res) => {
-//   const product = await Product.findById(req.params.id);
-//   if (!product) return res.status(404).json({ message: 'Product not found' });
-//   res.json(product);
-// });
-
-// // Update Product (owner only)
-// router.put('/:id', auth, async (req, res) => {
-//   const product = await Product.findById(req.params.id);
-//   if (!product) return res.status(404).json({ message: 'Product not found' });
-//   if (product.ownerId.toString() !== req.user.id)
-//     return res.status(403).json({ message: 'Unauthorized' });
-
-//   const { title, description, category, price, imagePlaceholder } = req.body;
-//   product.title = title;
-//   product.description = description;
-//   product.category = category;
-//   product.price = price;
-//   product.imagePlaceholder = imagePlaceholder;
-//   await product.save();
-//   res.json(product);
-// });
-
-// // Delete Product (owner only)
-// router.delete('/:id', auth, async (req, res) => {
-//   const product = await Product.findById(req.params.id);
-//   if (!product) return res.status(404).json({ message: 'Product not found' });
-//   if (product.ownerId.toString() !== req.user.id)
-//     return res.status(403).json({ message: 'Unauthorized' });
-
-//   await product.deleteOne();
-//   res.json({ message: 'Product deleted' });
-// });
-
-// export default router;
